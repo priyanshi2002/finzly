@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Collections;
+import java.util.InputMismatchException;
 
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class TradeServiceFx {
 	// method for validation
 	public static Map<String, String> Validation(Trade trade) {
 		Map<String, String> errorResp = new TreeMap<>();
-
+               try {
 		if (trade.getName() == null) {
 			errorResp.put("Name", "Customer name can't be null");
 		}
@@ -29,10 +31,19 @@ public class TradeServiceFx {
 		if (trade.getAmount() < 0) {
 			errorResp.put("USD Amount", "Amount cannot be negative , Please enter a valid amount");
 		}
+	       }
+	       catch (ClassCastException e) {
+			return Collections.singletonMap("Invalid entry please read exception and submit " , "Thank you!!");
+		}
+		
+		try {
 		if (!trade.getCurrencyPair().equals("USDINR")) {
 			errorResp.put("Currency Pair", "Invalid currency pair. only USDINR is supported");
 		}
-
+		} 
+			catch (InputMismatchException im) {
+			return Collections.singletonMap("Invalid entry please read exception and submit " , "Thank you!!");
+		}
 		return errorResp;
 	}
 
@@ -40,6 +51,7 @@ public class TradeServiceFx {
 	public static Map<String, String> bookTrade(Trade trade) {
 		Map<String, String> responses = new LinkedHashMap<>();
 		responses = Validation(trade);
+		try {
 		if (!responses.isEmpty()) {
 			responses.put("Message", "Trade not booked");
 		}
@@ -57,11 +69,15 @@ public class TradeServiceFx {
 			book.add(tbook);
 			return responses;
 		}
+		}
+		catch (NullPointerException np){
+			return Collections.singletonMap("Invalid entry please read exception and submit " , "Thank you!!");
+		}
 		return null;
 	}
 
 	public List<Trade> getTradeList() {
 		return this.book;
 	}
-
+}
 }
